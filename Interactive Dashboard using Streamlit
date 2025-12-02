@@ -1,0 +1,49 @@
+import streamlit as st
+import pandas as pd
+import numpy as np
+import altair as alt
+
+# Dashboard title
+st.title("Interactive Data Dashboard")
+
+# Sidebar filters
+st.sidebar.header("Controls")
+num_points = st.sidebar.slider("Number of data points", 10, 500, 100)
+
+# Generate random data
+data = pd.DataFrame({
+    "x": np.random.randn(num_points),
+    "y": np.random.randn(num_points),
+    "category": np.random.choice(["A", "B", "C"], num_points)
+})
+
+# Show dataframe
+st.subheader("Data Preview")
+st.dataframe(data.head())
+
+# Filter by category
+selected_category = st.sidebar.multiselect(
+    "Select Category",
+    options=["A", "B", "C"],
+    default=["A", "B", "C"]
+)
+
+filtered_data = data[data["category"].isin(selected_category)]
+
+# Chart
+st.subheader("Scatter Plot")
+chart = (
+    alt.Chart(filtered_data)
+    .mark_circle(size=60)
+    .encode(
+        x="x",
+        y="y",
+        color="category",
+        tooltip=["x", "y", "category"]
+    )
+)
+st.altair_chart(chart, use_container_width=True)
+
+# Summary stats
+st.subheader("Summary Statistics")
+st.write(filtered_data.describe())
