@@ -1,0 +1,29 @@
+import socket
+import os
+
+host = '0.0.0.0'   # listen on all interfaces
+port = 8080
+
+server_socket = socket.socket()
+server_socket.bind((host, port))
+server_socket.listen(1)
+
+print("Server is waiting for a connection...")
+
+conn, addr = server_socket.accept()
+print(f"Connected by {addr}")
+
+filename = "file_to_send.txt"   # file you want to send
+
+if os.path.exists(filename):
+    conn.send(filename.encode())
+    with open(filename, 'rb') as file:
+        data = file.read()
+        conn.sendall(data)
+    print("File sent successfully.")
+else:
+    conn.send("FILE_NOT_FOUND".encode())
+    print("File does not exist.")
+
+conn.close()
+server_socket.close()
